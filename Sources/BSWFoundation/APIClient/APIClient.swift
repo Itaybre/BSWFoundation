@@ -218,20 +218,6 @@ private extension APIClient {
         return try await perform(mutatedRequest)
     }
 
-    func deleteFileAtPath(fileURL: URL) async throws -> Void {
-        let void: Void = try await withCheckedThrowingContinuation { continuation in
-            FileManagerWrapper.shared.perform { fileManager in
-                do {
-                    try fileManager.removeItem(at: fileURL)
-                    continuation.resume(returning: ())
-                } catch let error {
-                    continuation.resume(throwing: error)
-                }
-            }
-        }
-        return void /// as of Xcode 13.2, this stupid variable was required
-    }
-
     /// Proxy object to do all our URLSessionDelegate work
     final class SessionDelegate: NSObject, URLSessionDelegate {
         

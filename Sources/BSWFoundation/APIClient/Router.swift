@@ -57,21 +57,6 @@ extension APIClient {
     }
 }
 
-extension APIClient {
-    class FileManagerWrapper {
-        
-        static let shared = FileManagerWrapper()
-        private let fileManager = FileManager()
-        private let queue = DispatchQueue(label: "\(ModuleName).APIClient.filemanager")
-        
-        func perform(_ block: @escaping (FileManager) -> Void) {
-            queue.sync {
-                block(fileManager)
-            }
-        }
-    }
-}
-
 private enum URLEncoding {
     static func query(_ parameters: [String: Any]) -> String {
         var components: [(String, String)] = []
