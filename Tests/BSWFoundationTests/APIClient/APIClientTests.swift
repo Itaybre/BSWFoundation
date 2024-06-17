@@ -5,7 +5,7 @@
 import XCTest
 import BSWFoundation
 
-class APIClientTests: XCTestCase {
+class APIClientTests: XCTestCase, @unchecked Sendable {
 
     var sut: APIClient!
 

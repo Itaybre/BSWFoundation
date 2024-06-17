@@ -5,6 +5,7 @@ import BSWFoundation
 
 class ProgressObserverTests: XCTestCase {
 
+    @MainActor
     func testProgressObserving() {
 
         let progress = Progress(totalUnitCount: 2)
