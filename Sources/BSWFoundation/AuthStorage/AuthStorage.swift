@@ -7,6 +7,7 @@ import Foundation
 import KeychainAccess
 
 /// A class that's useful to store sensitive information using the device's Keychain.
+@MainActor
 public class AuthStorage {
     
     /// A standard `AuthStorage` with a `.simple` style.
