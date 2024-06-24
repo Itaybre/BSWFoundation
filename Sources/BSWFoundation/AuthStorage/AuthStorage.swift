@@ -4,17 +4,22 @@
 //
 
 import Foundation
-import KeychainAccess
+@preconcurrency import KeychainAccess
 
 /// A class that's useful to store sensitive information using the device's Keychain.
-@MainActor
-public final class AuthStorage {
+public final class AuthStorage: Sendable {
     
     /// A standard `AuthStorage` with a `.simple` style.
     public static let defaultStorage = AuthStorage()
 
-    @UserDefaultsBacked(key: Keys.HasAppBeenExecuted, defaultValue: false)
-    private var appBeenExecuted: Bool!
+    private var appBeenExecuted: Bool {
+        get {
+            UserDefaults.standard.bool(forKey: Keys.HasAppBeenExecuted)
+        }
+        set {
+            UserDefaults.standard.setValue(newValue, forKey: Keys.HasAppBeenExecuted)
+        }
+    }
     private let keychain: Keychain
 
     /// Where should `AppStorage` put it's values.
