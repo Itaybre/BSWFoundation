@@ -199,7 +199,7 @@ private func generateRandomData() -> Data {
 private class MockAPIClientDelegate: NSObject, APIClientDelegate {
     func apiClientDidReceiveUnauthorized(forRequest atPath: String, apiClientID: APIClient.ID) async throws -> Bool {
         failedPath = atPath
-        XCTAssert(Thread.isMainThread)
+        dispatchPrecondition(condition: .onQueue(.main))
         return false
     }
     var failedPath: String?
