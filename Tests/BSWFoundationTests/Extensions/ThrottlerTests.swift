@@ -2,7 +2,7 @@ import Foundation
 import XCTest
 import BSWFoundation
 
-class ThrottlerTests: XCTestCase {
+class ThrottlerTests: XCTestCase, @unchecked Sendable {
     func testItWorks() {
         let sut = Throttler(seconds: 0.5)
         var numberOfTimesThisIsExecuted = 0
@@ -28,7 +28,7 @@ class ThrottlerTests: XCTestCase {
         let sut = Throttler(seconds: maxInterval)
         var numberOfTimesThisIsExecuted = 0
         let exp = expectation(description: "must be filled once")
-        var areWeDoneHere = false
+        nonisolated(unsafe) var areWeDoneHere = false
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(Int(maxInterval * 100) - 10)) {
             exp.fulfill()
             areWeDoneHere = true

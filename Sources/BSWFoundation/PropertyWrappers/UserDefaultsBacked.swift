@@ -8,7 +8,7 @@ import Foundation
 ///
 /// The value parameter can be only property list objects: `NSData`, `NSString`, `NSNumber`, `NSDate`, `NSArray`, or `NSDictionary`.
 @propertyWrapper
-public class UserDefaultsBacked<T> {
+public final class UserDefaultsBacked<T: Sendable>: @unchecked Sendable {
     private let key: String
     private let defaultValue: T?
     private let store: UserDefaults
@@ -51,7 +51,7 @@ public extension UserDefaultsBacked {
 
 /// Stores the given `T` type on User Defaults (as long as it's `Codable`)
 @propertyWrapper
-public class CodableUserDefaultsBacked<T: Codable> {
+public final class CodableUserDefaultsBacked<T: Codable>: @unchecked Sendable {
     private let key: String
     private let defaultValue: T?
     private let store: UserDefaults

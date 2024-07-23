@@ -102,9 +102,9 @@ open class APIClient: Identifiable {
 extension APIClient {
     
     /// Encapsualtes the Request to be sent to the server.
-    public struct Request<ResponseType>{
+    public struct Request<ResponseType: Sendable>: Sendable {
 
-        public typealias Validator = (APIClient.Response) throws -> ()
+        public typealias Validator = @Sendable (APIClient.Response) throws -> ()
         
         /// The Endpoint where to send this request.
         public let endpoint: Endpoint
@@ -128,7 +128,7 @@ extension APIClient {
     }
 
     /// Errors thrown from the `APIClient`.
-    public enum Error: Swift.Error {
+    public enum Error: Swift.Error, Sendable {
         /// The URL resulting from generating the `URLRequest` is not valid.
         case malformedURL
         /// The response received from the Server is malformed.
@@ -308,7 +308,7 @@ extension URLSession: APIClientNetworkFetcher {
 }
 
 public typealias HTTPHeaders = [String: String]
-public struct VoidResponse: Decodable, Hashable {}
+public struct VoidResponse: Decodable, Hashable, Sendable {}
 
 private extension Swift.Error {
     var is401: Bool {
