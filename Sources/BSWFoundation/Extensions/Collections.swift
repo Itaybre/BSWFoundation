@@ -132,6 +132,7 @@ public struct SelectableArray<T>: Collection {
 }
 
 extension SelectableArray: Equatable where T: Equatable {}
+extension SelectableArray: Sendable where T: Sendable {}
 
 public extension Sequence {
     func asyncMap<T>(_ transform: (Element) async throws -> T) async rethrows -> [T] {

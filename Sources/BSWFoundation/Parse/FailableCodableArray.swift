@@ -2,7 +2,7 @@ import Foundation
 
 public struct FailableCodableArray<Element : Decodable> : Decodable {
 
-    public var elements: [Element]
+    public let elements: [Element]
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
@@ -10,6 +10,8 @@ public struct FailableCodableArray<Element : Decodable> : Decodable {
         self.elements = elements.compactMap { $0.base }
     }
 }
+
+extension FailableCodableArray: Sendable where Element: Sendable {}
 
 extension FailableCodableArray: DateDecodingStrategyProvider where Element: DateDecodingStrategyProvider {
     public static var dateDecodingStrategy: DateFormatter {
