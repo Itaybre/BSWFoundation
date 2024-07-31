@@ -59,7 +59,7 @@ public extension Dictionary {
     }
 }
 
-public struct SelectableArray<T: Sendable>: Collection, Sendable {
+public struct SelectableArray<T>: Collection {
     public private(set) var selectedIndex: Int?
     public private(set) var options: [T]
 
@@ -132,6 +132,7 @@ public struct SelectableArray<T: Sendable>: Collection, Sendable {
 }
 
 extension SelectableArray: Equatable where T: Equatable {}
+extension SelectableArray: Sendable where T: Sendable {}
 
 public extension Sequence {
     func asyncMap<T>(_ transform: (Element) async throws -> T) async rethrows -> [T] {

@@ -1,6 +1,6 @@
 import Foundation
 
-public struct FailableCodableArray<Element : Decodable & Sendable> : Decodable, Sendable {
+public struct FailableCodableArray<Element : Decodable> : Decodable {
 
     public let elements: [Element]
 
@@ -10,6 +10,8 @@ public struct FailableCodableArray<Element : Decodable & Sendable> : Decodable, 
         self.elements = elements.compactMap { $0.base }
     }
 }
+
+extension FailableCodableArray: Sendable where Element: Sendable {}
 
 extension FailableCodableArray: DateDecodingStrategyProvider where Element: DateDecodingStrategyProvider {
     public static var dateDecodingStrategy: DateFormatter {
