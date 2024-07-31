@@ -1,8 +1,8 @@
 import Foundation
 
-public struct FailableCodableArray<Element : Decodable> : Decodable {
+public struct FailableCodableArray<Element : Decodable & Sendable> : Decodable, Sendable {
 
-    public var elements: [Element]
+    public let elements: [Element]
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()

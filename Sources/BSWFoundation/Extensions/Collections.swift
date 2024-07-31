@@ -59,7 +59,7 @@ public extension Dictionary {
     }
 }
 
-public struct SelectableArray<T>: Collection {
+public struct SelectableArray<T: Sendable>: Collection, Sendable {
     public private(set) var selectedIndex: Int?
     public private(set) var options: [T]
 
