@@ -32,11 +32,11 @@ public protocol Endpoint: Sendable {
     var timeoutInterval: TimeInterval? { get }
 }
 
-public enum HTTPMethod: String {
+public enum HTTPMethod: String, Sendable {
     case GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH, TRACE, CONNECT
 }
 
-public enum HTTPParameterEncoding {
+public enum HTTPParameterEncoding: Sendable {
     case url
     case json
 }
@@ -65,7 +65,7 @@ extension Endpoint {
 }
 
 
-public enum MimeType {
+public enum MimeType: Sendable {
     case imageJPEG
     case imagePNG
     case custom(String)
