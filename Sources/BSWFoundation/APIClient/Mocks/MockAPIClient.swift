@@ -4,7 +4,7 @@
 
 import Foundation
 
-public class MockNetworkFetcher: APIClientNetworkFetcher {
+public actor MockNetworkFetcher: APIClientNetworkFetcher {
     
     enum Error: Swift.Error {
         case noDataProvided
@@ -14,6 +14,10 @@ public class MockNetworkFetcher: APIClientNetworkFetcher {
     public var mockedData: Data!
     public var mockedStatusCode: Int = 200
     public var capturedURLRequest: URLRequest?
+    
+    public func setMockedData(mockedData: Data) async {
+        self.mockedData = mockedData
+    }
     
     public func fetchData(with urlRequest: URLRequest) async throws -> APIClient.Response {
         guard mockedData != nil else {
