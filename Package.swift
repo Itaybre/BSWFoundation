@@ -33,4 +33,6 @@ let package = Package(
             dependencies: ["BSWFoundation"]
         ),
     ]
+//    ,
+//    swiftLanguageVersions: [.version("6.0.0")]
 )

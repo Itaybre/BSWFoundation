@@ -29,7 +29,7 @@ class ThrottlerTests: XCTestCase, @unchecked Sendable {
         var numberOfTimesThisIsExecuted = 0
         let exp = expectation(description: "must be filled once")
         nonisolated(unsafe) var areWeDoneHere = false
-        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(Int(maxInterval * 100) - 10)) {
+        DispatchQueue.global().asyncAfter(deadline: .now() + .milliseconds(Int(maxInterval * 100) - 10)) {
             exp.fulfill()
             areWeDoneHere = true
         }
