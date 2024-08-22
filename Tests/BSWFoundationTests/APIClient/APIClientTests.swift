@@ -150,7 +150,7 @@ class APIClientTests: XCTestCase, @unchecked Sendable {
     
     func testCustomizeRequests() async throws {
         let mockNetworkFetcher = MockNetworkFetcher()
-        mockNetworkFetcher.mockedData = Data()
+        await mockNetworkFetcher.setMockedData(mockedData: Data())
         sut = APIClient(environment: HTTPBin.Hosts.production, networkFetcher: mockNetworkFetcher)
         sut.customizeRequest = {
             var mutableURLRequest = $0
@@ -164,7 +164,7 @@ class APIClientTests: XCTestCase, @unchecked Sendable {
 
         let _ = try await sut.perform(ipRequest)
         
-        guard let capturedURLRequest = mockNetworkFetcher.capturedURLRequest else {
+        guard let capturedURLRequest = await mockNetworkFetcher.capturedURLRequest else {
             throw ValidationError()
         }
         XCTAssert(capturedURLRequest.allHTTPHeaderFields?["Signature"] == "hello")
@@ -172,7 +172,7 @@ class APIClientTests: XCTestCase, @unchecked Sendable {
     
     func testCustomizeSimpleRequests() async throws {
         let mockNetworkFetcher = MockNetworkFetcher()
-        mockNetworkFetcher.mockedData = Data()
+        await mockNetworkFetcher.setMockedData(mockedData: Data())
         sut = APIClient(environment: HTTPBin.Hosts.production, networkFetcher: mockNetworkFetcher)
         sut.customizeRequest = {
             var mutableURLRequest = $0
@@ -182,7 +182,7 @@ class APIClientTests: XCTestCase, @unchecked Sendable {
         
         let _ = try await sut.performSimpleRequest(forEndpoint: HTTPBin.API.ip)
         
-        guard let capturedURLRequest = mockNetworkFetcher.capturedURLRequest else {
+        guard let capturedURLRequest = await mockNetworkFetcher.capturedURLRequest else {
             throw ValidationError()
         }
         XCTAssert(capturedURLRequest.allHTTPHeaderFields?["Signature"] == "hello")
