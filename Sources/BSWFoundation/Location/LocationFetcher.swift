@@ -18,9 +18,21 @@ import CoreLocation
 @MainActor
 public final class LocationFetcher: NSObject, CLLocationManagerDelegate {
     
-    public enum LocationErrors: Swift.Error {
+    public enum LocationErrors: LocalizedError {
         case authorizationDenied
+        case coreLocationError(Swift.Error)
         case unknown
+        
+        public var localizedDescription: String {
+            switch self {
+            case .authorizationDenied:
+                return "LocationFetcher.Error.authorizationDenied"
+            case .coreLocationError(let error):
+                return error.localizedDescription
+            case .unknown:
+                return "LocationFetcher.Error.unknown"
+            }
+        }
     }
     
     public static let fetcher = LocationFetcher()
@@ -72,7 +84,7 @@ public final class LocationFetcher: NSObject, CLLocationManagerDelegate {
         })
     }
     
-    private func completeCurrentRequest(_ result: Swift.Result<CLLocation, LocationErrors> = .failure(.unknown)) {
+    private func completeCurrentRequest(_ result: Swift.Result<CLLocation, LocationErrors>) {
         continuations.forEach({
             switch result {
             case .failure(let error):
@@ -98,7 +110,7 @@ public final class LocationFetcher: NSObject, CLLocationManagerDelegate {
     public nonisolated func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("Error finding location: \(error.localizedDescription)")
         MainActor.assumeIsolated {
-            completeCurrentRequest()
+            completeCurrentRequest(.failure(.coreLocationError(error)))
         }
     }
     
@@ -113,11 +125,12 @@ public final class LocationFetcher: NSObject, CLLocationManagerDelegate {
             return (status == .authorizedAlways || status == .authorizedWhenInUse)
             #endif
         }()
-        if isStatusAuthorized {
-            manager.requestLocation()
-        } else {
-            MainActor.assumeIsolated {
-                completeCurrentRequest()
+        
+        MainActor.assumeIsolated {
+            if isStatusAuthorized {
+                manager.requestLocation()
+            } else {
+                completeCurrentRequest(.failure(.authorizationDenied))
             }
         }
     }
