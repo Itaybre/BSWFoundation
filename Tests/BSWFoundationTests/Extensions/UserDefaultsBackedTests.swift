@@ -1,11 +1,15 @@
-import XCTest
+
+import Testing
+import Foundation
 import BSWFoundation
 
-class UserDefaultsBackedTests: XCTestCase {
-
-    func testItStoresStrings() {
+@Suite(.serialized)
+actor UserDefaultsBackedTests {
+    
+    @Test
+    func itStoresStrings() {
         class Mock {
-            @UserDefaultsBacked(key: "Hello") var someValue: Int?
+            @UserDefaultsBacked(key: UserDefaultsKey) var someValue: Int?
             deinit {
                 _someValue.reset()
             }
@@ -14,18 +18,19 @@ class UserDefaultsBackedTests: XCTestCase {
         var sut: Mock! = Mock()
         sut.someValue = 8
         
-        guard let value = UserDefaults.standard.object(forKey: "Hello") as? Int else {
-            XCTFail()
+        guard let value = UserDefaults.standard.object(forKey: UserDefaultsKey) as? Int else {
+            Issue.record("Failed to retrieve the stored Int value")
             return
         }
-        XCTAssert(value == 8)
+        #expect(value == 8)
         sut = nil
-        XCTAssertNil(UserDefaults.standard.object(forKey: "Hello") as? Int)
+        #expect(UserDefaults.standard.object(forKey: UserDefaultsKey) as? Int == nil)
     }
 
-    func testItStoresBool() {
+    @Test
+    func itStoresBool() {
         class Mock {
-            @UserDefaultsBacked(key: "Hello") var someValue: Bool?
+            @UserDefaultsBacked(key: UserDefaultsKey) var someValue: Bool?
             deinit {
                 _someValue.reset()
             }
@@ -34,18 +39,19 @@ class UserDefaultsBackedTests: XCTestCase {
         var sut: Mock! = Mock()
         sut.someValue = true
         
-        guard let value = UserDefaults.standard.object(forKey: "Hello") as? Bool else {
-            XCTFail()
+        guard let value = UserDefaults.standard.object(forKey: UserDefaultsKey) as? Bool else {
+            Issue.record("Failed to retrieve the stored Bool value")
             return
         }
-        XCTAssert(value == true)
+        #expect(value == true)
         sut = nil
-        XCTAssertNil(UserDefaults.standard.object(forKey: "Hello") as? Bool)
+        #expect(UserDefaults.standard.object(forKey: UserDefaultsKey) as? Bool == nil)
     }
 
-    func testItStoresDefaultValue() {
+    @Test
+    func itStoresDefaultValue() {
         class Mock {
-            @UserDefaultsBacked(key: "Hello", defaultValue: "FuckMe") var someValue: String?
+            @UserDefaultsBacked(key: UserDefaultsKey, defaultValue: "DefaultValue") var someValue: String?
             deinit {
                 _someValue.reset()
             }
@@ -54,19 +60,19 @@ class UserDefaultsBackedTests: XCTestCase {
         let sut = Mock()
 
         guard let value = sut.someValue else {
-            XCTFail()
+            Issue.record("Failed to retrieve the default String value")
             return
         }
-        XCTAssert(value == "FuckMe")
+        #expect(value == "DefaultValue")
     }
     
-    func testItStoresCodable() {
+    @Test
+    func itStoresCodable() {
         struct SomeData: Codable {
             let id: String
         }
         class Mock {
-            
-            @CodableUserDefaultsBacked(key: "Hello")
+            @CodableUserDefaultsBacked(key: UserDefaultsKey)
             var someValue: SomeData?
             
             init() {
@@ -78,14 +84,17 @@ class UserDefaultsBackedTests: XCTestCase {
         }
         
         var sut: Mock! = Mock()
-        XCTAssertNotNil(sut.someValue)
+        #expect(sut.someValue != nil)
         
-        guard let data = UserDefaults.standard.data(forKey: "Hello") else {
-            XCTFail()
+        guard let data = UserDefaults.standard.data(forKey: UserDefaultsKey) else {
+            Issue.record("Failed to retrieve the stored Codable value")
             return
         }
-        XCTAssertNotNil(data)
+        #expect(data != nil)
         sut = nil
-        XCTAssertNil(UserDefaults.standard.data(forKey: "Hello"))
+        #expect(UserDefaults.standard.data(forKey: UserDefaultsKey) == nil)
     }
 }
+
+
+private let UserDefaultsKey = "Key"
