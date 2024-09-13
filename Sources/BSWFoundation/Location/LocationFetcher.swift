@@ -23,7 +23,7 @@ public final class LocationFetcher: NSObject, CLLocationManagerDelegate {
         case coreLocationError(Swift.Error)
         case unknown
         
-        public var localizedDescription: String {
+        public var errorDescription: String? {
             switch self {
             case .authorizationDenied:
                 return "LocationFetcher.Error.authorizationDenied"
@@ -126,10 +126,10 @@ public final class LocationFetcher: NSObject, CLLocationManagerDelegate {
             #endif
         }()
         
-        MainActor.assumeIsolated {
-            if isStatusAuthorized {
-                manager.requestLocation()
-            } else {
+        if isStatusAuthorized {
+            manager.requestLocation()
+        } else {
+            MainActor.assumeIsolated {
                 completeCurrentRequest(.failure(.authorizationDenied))
             }
         }
