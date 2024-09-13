@@ -9,8 +9,8 @@ jobs:
     runs-on: ios
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Build
-      run: swift package clean; swift build -v
+      run: swift package clean; swift build
     - name: Run tests
-      run: swift test -v 2>&1 | xcbeautify
+      run: swift test

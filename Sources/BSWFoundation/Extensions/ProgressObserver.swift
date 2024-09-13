@@ -6,21 +6,20 @@
 import Foundation
 
 /// A simple wrapper on top of `Foundation.Progress` that makes it easier to observe it's progress.
-public class ProgressObserver: NSObject, @unchecked Sendable {
+public final class ProgressObserver: NSObject, Sendable {
     
-    fileprivate let onUpdate: (Progress) -> Void
-    fileprivate let progress: Progress
+    private let onUpdate: @MainActor (Progress) -> Void
+    private let progress: Progress
+    private nonisolated(unsafe) var observer: NSKeyValueObservation!
     
-    private var observer: NSKeyValueObservation!
-    
-    public init(progress: Progress, onUpdate: @escaping (Progress) -> Void) {
+    public init(progress: Progress, onUpdate: @escaping @MainActor (Progress) -> Void) {
         self.progress = progress
         self.onUpdate = onUpdate
         super.init()
         self.observer = progress.observe(\.fractionCompleted) { [weak self] (progress, _) in
-            guard let self else { return }
+            guard let onUpdate = self?.onUpdate else { return }
             Task { @MainActor in
-                self.onUpdate(progress)
+                onUpdate(progress)
             }
         }
     }

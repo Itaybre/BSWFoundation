@@ -1,13 +1,15 @@
-
 #if os(iOS)
 
-import XCTest
+import Testing
 import BSWFoundation
+import UIKit
 
-class UIApplicationTests: XCTestCase {
+actor UIApplicationTests {
+
     @MainActor
-    func testItWorks() {
-        XCTAssert(UIApplication.shared.isRunningTests)
+    @Test
+    func itWorks() {
+        #expect(UIApplication.shared.isRunningTests)
     }
 }
 
