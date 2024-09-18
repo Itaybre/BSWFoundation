@@ -18,15 +18,27 @@ import CoreLocation
 @MainActor
 public final class LocationFetcher: NSObject, CLLocationManagerDelegate {
     
-    public enum LocationErrors: Swift.Error {
+    public enum Error: LocalizedError {
         case authorizationDenied
+        case coreLocationError(Swift.Error)
         case unknown
+        
+        public var errorDescription: String? {
+            switch self {
+            case .authorizationDenied:
+                return "LocationFetcher.Error.authorizationDenied"
+            case .coreLocationError(let error):
+                return error.localizedDescription
+            case .unknown:
+                return "LocationFetcher.Error.unknown"
+            }
+        }
     }
     
     public static let fetcher = LocationFetcher()
     
     internal var locationManager = CLLocationManager()
-    private var continuations: [CheckedContinuation<CLLocation, Error>] = []
+    private var continuations: [CheckedContinuation<CLLocation, Swift.Error>] = []
     public let desiredAccuracy = kCLLocationAccuracyHundredMeters
     public var lastKnownLocation: CLLocation?
 
@@ -56,7 +68,7 @@ public final class LocationFetcher: NSObject, CLLocationManagerDelegate {
         case .restricted:
             fallthrough
         case .denied:
-            throw LocationErrors.authorizationDenied
+            throw LocationFetcher.Error.authorizationDenied
         case .authorizedAlways:
             fallthrough
         case .authorizedWhenInUse:
@@ -64,7 +76,7 @@ public final class LocationFetcher: NSObject, CLLocationManagerDelegate {
         case .notDetermined:
             locationManager.requestWhenInUseAuthorization()
         @unknown default:
-            throw LocationErrors.unknown
+            throw LocationFetcher.Error.unknown
         }
         
         return try await withCheckedThrowingContinuation({ continuation in
@@ -72,7 +84,7 @@ public final class LocationFetcher: NSObject, CLLocationManagerDelegate {
         })
     }
     
-    private func completeCurrentRequest(_ result: Swift.Result<CLLocation, LocationErrors> = .failure(.unknown)) {
+    private func completeCurrentRequest(_ result: Swift.Result<CLLocation, LocationFetcher.Error>) {
         continuations.forEach({
             switch result {
             case .failure(let error):
@@ -95,10 +107,10 @@ public final class LocationFetcher: NSObject, CLLocationManagerDelegate {
         }
     }
     
-    public nonisolated func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+    public nonisolated func locationManager(_ manager: CLLocationManager, didFailWithError error: Swift.Error) {
         print("Error finding location: \(error.localizedDescription)")
         MainActor.assumeIsolated {
-            completeCurrentRequest()
+            completeCurrentRequest(.failure(.coreLocationError(error)))
         }
     }
     
@@ -113,11 +125,12 @@ public final class LocationFetcher: NSObject, CLLocationManagerDelegate {
             return (status == .authorizedAlways || status == .authorizedWhenInUse)
             #endif
         }()
+        
         if isStatusAuthorized {
             manager.requestLocation()
         } else {
             MainActor.assumeIsolated {
-                completeCurrentRequest()
+                completeCurrentRequest(.failure(.authorizationDenied))
             }
         }
     }
